@@ -2,3 +2,4 @@ changes/
 upload/
 themes/default/css/.sass-cache/
 node_modules/
+.idea
