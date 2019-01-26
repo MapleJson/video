@@ -1,0 +1,101 @@
+<div class="user-setting-panel pt_shadow">
+	<div class="yp_sett_header">
+		<div class="ava_combo">
+			<div class="ava">
+				<img src="{{USER avatar}}" alt="{{USER id}}" />
+			</div>
+			<div class="logo_svg">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M404 160H108c-33.1 0-60 26.9-60 60v168c0 33.1 26.9 60 60 60h296c33.1 0 60-26.9 60-60V220c0-33.1-26.9-60-60-60zM342.9 65L108 110.9c-18 4-44 22.1-44 44.1 0 0 15-19 49-19h287v-20.5c0-12.6-5-28.7-13.9-37.6-11.3-11.3-27.5-16.2-43.2-12.9z"></path></svg>
+			</div>
+		</div>
+		<h4>{{LANG monetization}}</h4>
+	</div>
+	<form id="toggle-video-monetization-form" class="form-horizontal">
+		<span class="pull-right">
+            <a href="{{LINK settings/withdrawals/{{ME username}}}}"> 
+                <i class="material-icons">history</i> {{LANG withdrawals}}
+            </a>
+        </span>
+		<div class="form-group">
+			<label class="col-md-2" for="monetization">{{LANG monetization}}</label>
+			<div class="col-md-6">
+				<input type="checkbox" <?php echo ($pt->settings->video_mon == '1') ? 'checked': '';?> data-toggle="toggle" data-onstyle="success" data-on="{{LANG enabled}}" data-off="{{LANG disabled}}" id="toggle-video-monetization">
+			</div>
+		</div>
+		<div class="clear"></div>
+	</form>
+	<hr>
+	<div class="alert alert-info">
+     {{LANG earn_mon}}
+	</div>
+	<form class="form-horizontal user-monetization-panel pt_forms" id="monetization-settings" method="POST">
+		<div class="monetization-settings-alert"></div>
+        <div class="form-group">
+            <label class="col-md-12">{{LANG balance}}</label>
+            <div class="col-md-10">
+                <input type="text" readonly="true" class="form-control input-md" value="{{ME balance}}">
+            </div>
+            <div class="col-md-2 no-padding-left">
+                <input type="text" value="{{CONFIG payment_currency}}" readonly="true" class="form-control read-only">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-12">PayPal E-mail</label>
+            <div class="col-md-12">
+                <input type="email" class="form-control input-md" value="{{ME email}}" name="email">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-12">{{LANG amount}}</label>
+            <div class="col-md-12">
+                <input type="number" class="form-control input-md" placeholder="0.00" name="amount">
+            </div>
+            <div class="col-md-3 no-padding-left">
+                <input type="text" value="{{LANG min}} 50: {{CONFIG payment_currency}}" readonly="true" class="form-control read-only">
+            </div>
+        </div>
+        <input type="hidden" name="hash_id" value="<?php echo PT_CreateSession()?>">
+        <input type="hidden" name="user_id" value="{{USER id}}">
+        <div class="last-sett-btn modal-footer" style="margin: 0px -30px -10px -30px;">
+			<button id="submit" class="btn btn-main setting-panel-mdbtn" type="submit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> {{LANG submit_withdrawal_request}}</button>
+        </div>
+	</form>
+</div>
+
+<script>
+    jQuery(document).ready(function($) {
+        $("#withdrawal-requests").DataTable();
+
+        $("#toggle-video-monetization").change(function(event) {
+            let hash_id = $('.main_session').val();
+            let url     = "{{LINK aj/user/video-monetization}}?hash=" + hash_id;
+            $.post(url,{user_id:'<?php echo($pt->settings->id);?>'}, function(data, textStatus, xhr) { /* pass */});
+        });
+
+        var form = $('form#monetization-settings');
+        form.ajaxForm({
+            url: '{{LINK aj/user/request-withdrawal}}?hash=' + $('.main_session').val(),
+            dataType:'json',
+            beforeSend: function() {
+                form.find('button').text("{{LANG please_wait}}");
+            },
+            success: function(data) {
+                scrollToTop();
+                if (data.status == 200) {
+                    $('.monetization-settings-alert').html('<div class="alert alert-success bg-success">' + data.message + '</div>');
+                    $('.alert-success').fadeIn('fast', function() {
+                        $(this).delay(2500).slideUp(500, function() {
+                            $(this).remove();
+                        });
+                    });
+                } 
+                else if (data.status == 400) {
+                    $('.monetization-settings-alert').html('<div class="alert alert-danger bg-danger">' + data.message + '</div>');
+                    $('.alert-danger').fadeIn(300);
+                }
+                form.find('button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> {{LANG submit_withdrawal_request}}');
+            }
+        });
+    });
+
+</script>

@@ -1,0 +1,22 @@
+<div class="wo_about_wrapper_parent">
+	<div class="wo_about_wrapper"> 
+		<div class="hero hero-overlay"></div>
+	</div>
+</div>
+<div class="pt_page_margin">
+	<div class="mat_header">
+		<h1><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z" /></svg> {{TITLE}}</h1>
+	</div>
+	<div class="content pt_shadow" style="padding-top: 25px;">
+		<div class="col-md-12">
+			<div class="videos-latest-list row">
+			{{VIDEOS}}
+			</div>
+			<?php if ($pt->videos_count > 1) { ?>
+				<div class="watch-video-show-more desc load-more" data-type="{{TYPE}}" {{CATEGORY_ID}}>{{LANG show_more}}</div>
+			<?php } ?>
+			<div class="clear"></div>
+		</div>
+		<div class="clear"></div>
+	</div>
+</div>

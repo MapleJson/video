@@ -1,0 +1,170 @@
+<?php 
+$page           = (!empty($_GET['page-id'])) ? $_GET['page-id'] : 1;
+$filter_keyword = (!empty($_GET['query'])) ? PT_Secure($_GET['query']) : '';
+$db->pageLimit  = 500;
+
+
+if (!empty($filter_keyword)) {
+	$sql      = "`title` LIKE '%$filter_keyword%' OR `description` LIKE '%$filter_keyword%' OR `tags` LIKE '%$filter_keyword%'";
+	$articles = $db->where($sql)->orderBy('id', 'DESC')->objectbuilder()->paginate(T_POSTS, $page);
+} 
+
+else {
+	$articles = $db->objectbuilder()->orderBy('id', 'asc')->paginate(T_POSTS, $page);
+}
+
+if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
+	header("Location: " . PT_LoadAdminLinkSettings('manage-articles'));
+	exit();
+}
+
+?>
+
+<div class="container-fluid">
+    <div class="block-header">
+        <h2>文章 > 管理文章</h2>
+    </div>
+    <!-- Vertical Layout -->
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="header">
+                    <h2>管理 & 编辑文章</h2>
+                </div>
+                <div class="body">
+                   <div class="row">
+                       <div class="col-md-6" style="margin-bottom:0;">
+                            <form method="get" action="<?php echo PT_LoadAdminLinkSettings('manage-articles'); ?>">
+                              <div class="row">
+                              	<div class="col-md-9">
+	                              	<div class="form-group form-float">
+	                                    <div class="form-line">
+	                                        <input type="text" name="query" id="query" class="form-control">
+	                                        <label class="form-label search-form">搜索标题、标签、描述</label>
+	                                    </div>
+	                                </div>
+	                              </div>
+	                              <div class="col-md-3">
+	                              	 <button class="btn btn-info">搜索</button>
+	                              </div>
+                              </div>
+                              <div class="clearfix"></div>
+                           </form>
+                       </div>
+                   </div>
+                   <div class="clearfix"></div>
+                   <div class="table-responsive1">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                      <th>ID</th>
+					                  <th>标题</th>
+					                  <th>分类</th>
+					                  <th>日期</th>
+					                  <th>状态</th>
+					                  <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php 
+                                foreach ($articles as $key => $article) {
+                                	
+                                	$status   = ($article->active == 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-danger">Inactive</span>';
+
+                                	$category = 1;
+                                	$art_id   = $article->id;
+                                	if (in_array($article->category, array_keys(get_object_vars($pt->categories)))) {
+                                		$category =  $article->category;
+                                	}
+                                	
+                                	echo PT_LoadAdminPage('manage-articles/list', array(
+	                                		'ID'     => $article->id, 
+	                                		'TITLE' => PT_ShortText($article->title,50), 
+	                                		'CATEGORY' =>  $pt->categories->$category, 
+	                                		'DATE' => date('F-d-Y',$article->time), 
+	                                		'EDIT_LINK' => PT_LoadAdminLinkSettings("edit-article?id=$art_id"), 
+                                            'URL' => PT_Link("articles/read/$art_id"), 
+	                                		'STATUS' => $status
+                                		));
+                                }
+                            ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pull-left">
+                    	<?php echo "显示 $page 从 " . $db->totalPages; ?>
+                    </div>
+                    <div class="pull-right">
+                    	<nav>
+                            <ul class="pagination">
+                            	<li>
+                                    <a href="<?php echo PT_LoadAdminLinkSettings('manage-articles?page-id=1'); ?>" class="waves-effect" title='首页'>
+                                        <i class="material-icons">first_page</i>
+                                    </a>
+                                </li>
+                                <?php if ($page > 1) {  ?>
+                                <li>
+                                    <a href="<?php echo PT_LoadAdminLinkSettings('manage-articles?page-id=' . ($page - 1)); ?>" class="waves-effect" title='上一页'>
+                                        <i class="material-icons">chevron_left</i>
+                                    </a>
+                                </li>
+                                <?php  } ?>
+                                <?php 
+                                $nums = 0;
+                                $nums_pages = ($page > 4) ? ($page - 4) : $page;
+                                for ($i=$nums_pages; $i <= $db->totalPages; $i++) { 
+                                	if ($nums < 20) {
+                                	?>
+                                	<li class="<?php echo ($page == $i) ? 'active' : ''; ?>"><a href="<?php echo PT_LoadAdminLinkSettings('manage-articles?page-id=' . ($i)); ?>" class="waves-effect"><?php echo $i ?></a></li>
+                                	<?php
+                                	}
+                                	$nums++;
+                                }
+                                ?>
+                                <?php if ($db->totalPages > $page) { ?>
+                                <li>
+                                    <a href="<?php echo PT_LoadAdminLinkSettings('manage-articles?page-id=' . ($page + 1)); ?>" class="waves-effect" title="下一页">
+                                        <i class="material-icons">chevron_right</i>
+                                    </a>
+                                </li>
+                                <?php } ?>
+                                <li>
+                                    <a href="<?php echo PT_LoadAdminLinkSettings('manage-articles?page-id=' . ($db->totalPages)); ?>" class="waves-effect" title='最后'>
+                                        <i class="material-icons">last_page</i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!-- #END# Vertical Layout -->
+<div id="delete-modal" class="modal fade" role="dialog" data-id="">
+  <div class="modal-dialog">
+    <div class="modal-content modal-col-red">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">删除文章</h4>
+      </div>
+      <div class="modal-body">
+        <p>你确定要删除此文章？</p>
+      </div>
+      <div class="modal-footer">
+      	<button type="button" class="btn btn-link waves-effect delete-button" data-dismiss="modal" data-type="article">删除</button>
+        <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(function () {
+	$('.delete-content').on('click', function(event) {
+		event.preventDefault();
+		$('#delete-modal').attr('data-id', $(this).attr('data-id')).modal('show');
+	});
+});
+</script>

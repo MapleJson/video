@@ -1,0 +1,396 @@
+<?php 
+$pt->config->ffmpeg  = is_executable($pt->config->ffmpeg_binary_file);
+function isEnabled($func) {
+    return is_callable($func) && false === stripos(ini_get('disable_functions'), $func);
+}
+$enabled = true;
+if (!isEnabled('shell_exec')) {
+    $enabled = false;
+}
+
+?>
+
+<div class="container-fluid">
+    <div class="block-header">
+        <h2>设置 > 常规设置</h2>
+    </div>
+    <!-- Vertical Layout -->
+    <div class="row">
+        <div class="col-lg-6 col-md-6 pull-right">
+            <div class="card">
+                <div class="header">
+                    <h2>主要设置</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success video-settings-alert"></div>
+                    <form class="video-settings" method="POST">
+
+                        <label for="upload_system">上传视频系统</label>
+                        <div class="form-group">
+                            <input type="radio" name="upload_system" id="upload_system-enabled" value="on" <?php echo ($pt->config->upload_system == 'on') ? 'checked': '';?>>
+                            <label for="upload_system-enabled">启用</label>
+                            <input type="radio" name="upload_system" id="upload_system-disabled" value="off" <?php echo ($pt->config->upload_system == 'off') ? 'checked': '';?>>
+                            <label for="upload_system-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="import_system">导入视频系统</label>
+                        <div class="form-group">
+                            <input type="radio" name="import_system" id="import_system-enabled" value="on" <?php echo ($pt->config->import_system == 'on') ? 'checked': '';?>>
+                            <label for="import_system-enabled">启用</label>
+                            <input type="radio" name="import_system" id="import_system-disabled" value="off" <?php echo ($pt->config->import_system == 'off') ? 'checked': '';?>>
+                            <label for="import_system-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="resize_video">调整视频播放器</label>
+                        <div class="form-group">
+                            <input type="radio" name="resize_video" id="resize_video-enabled" value="on" <?php echo ($pt->config->resize_video == 'on') ? 'checked': '';?>>
+                            <label for="resize_video-enabled">启用</label>
+                            <input type="radio" name="resize_video" id="resize_video-disabled" value="off" <?php echo ($pt->config->resize_video == 'off') ? 'checked': '';?>>
+                            <label for="resize_video-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="autoplay_system">自动播放系统</label>
+                        <div class="form-group">
+                            <input type="radio" name="autoplay_system" id="autoplay_system-enabled" value="on" <?php echo ($pt->config->autoplay_system == 'on') ? 'checked': '';?>>
+                            <label for="autoplay_system-enabled">启用</label>
+                            <input type="radio" name="autoplay_system" id="autoplay_system-disabled" value="off" <?php echo ($pt->config->autoplay_system == 'off') ? 'checked': '';?>>
+                            <label for="autoplay_system-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="embed_system">嵌入视频系统</label>
+                        <div class="form-group">
+                            <input type="radio" name="embed_system" id="embed_system-enabled" value="on" <?php echo ($pt->config->embed_system == 'on') ? 'checked': '';?>>
+                            <label for="embed_system-enabled">启用</label>
+                            <input type="radio" name="embed_system" id="embed_system-disabled" value="off" <?php echo ($pt->config->embed_system == 'off') ? 'checked': '';?>>
+                            <label for="embed_system-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="history_system">历史记录系统</label>
+                        <div class="form-group">
+                            <input type="radio" name="history_system" id="history_system-enabled" value="on" <?php echo ($pt->config->history_system == 'on') ? 'checked': '';?>>
+                            <label for="history_system-enabled">启用</label>
+                            <input type="radio" name="history_system" id="history_system-disabled" value="off" <?php echo ($pt->config->history_system == 'off') ? 'checked': '';?>>
+                            <label for="history_system-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="article_system">文章系统</label>
+                        <div class="form-group">
+                            <input type="radio" name="article_system" id="article_system-enabled" value="on" <?php echo ($pt->config->article_system == 'on') ? 'checked': '';?>>
+                            <label for="article_system-enabled">启用</label>
+                            <input type="radio" name="article_system" id="article_system-disabled" value="off" <?php echo ($pt->config->article_system == 'off') ? 'checked': '';?>>
+                            <label for="article_system-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="download_videos">下载视频系统</label>
+                        <div class="form-group">
+                            <input type="radio" name="download_videos" id="download_videos-enabled" value="on" <?php echo ($pt->config->download_videos == 'on') ? 'checked': '';?>>
+                            <label for="download_videos-enabled">启用</label>
+                            <input type="radio" name="download_videos" id="download_videos-disabled" value="off" <?php echo ($pt->config->download_videos == 'off') ? 'checked': '';?>>
+                            <label for="download_videos-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="facebook_import">导入Facebook视频</label>
+                        <div class="form-group">
+                            <input type="radio" name="facebook_import" id="facebook_import-enabled" value="on" <?php echo ($pt->config->facebook_import == 'on') ? 'checked': '';?>>
+                            <label for="facebook_import-enabled">启用</label>
+                            <input type="radio" name="facebook_import" id="facebook_import-disabled" value="off" <?php echo ($pt->config->facebook_import == 'off') ? 'checked': '';?>>
+                            <label for="facebook_import-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="donate_system">打赏通道</label>
+                        <div class="form-group">
+                            <input type="radio" name="donate_system" id="donate_system-enabled" value="on" <?php echo ($pt->config->donate_system == 'on') ? 'checked': '';?>>
+                            <label for="donate_system-enabled">启用</label>
+                            <input type="radio" name="donate_system" id="donate_system-disabled" value="off" <?php echo ($pt->config->donate_system == 'off') ? 'checked': '';?>>
+                            <label for="donate_system-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="approve_videos">审核视频</label>
+                        <div class="form-group">
+                            <input type="radio" name="approve_videos" id="approve_videos-enabled" value="on" <?php echo ($pt->config->approve_videos == 'on') ? 'checked': '';?>>
+                            <label for="approve_videos-enabled">启用</label>
+                            <input type="radio" name="approve_videos" id="approve_videos-disabled" value="off" <?php echo ($pt->config->approve_videos == 'off') ? 'checked': '';?>>
+                            <label for="approve_videos-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="videos_upload_limit" name="videos_upload_limit" class="form-control" value="{{CONFIG videos_upload_limit}}">
+                                <label class="form-label">每个用户的视频上传限制（默认值0 =无限制|仅当禁用了专业系统时才有效）</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 ">
+            <div class="card">
+                <div class="header">
+                    <h2>用户设置</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success user-settings-alert"></div>
+                    <form class="user-settings" method="POST">
+                        <label for="user_registration">用户注册</label>
+                        <div class="form-group">
+                            <input type="radio" name="user_registration" id="user_registration-enabled" value="on" <?php echo ($pt->config->user_registration == 'on') ? 'checked': '';?>>
+                            <label for="user_registration-enabled">启用</label>
+                            <input type="radio" name="user_registration" id="user_registration-disabled" value="off" <?php echo ($pt->config->user_registration == 'off') ? 'checked': '';?>>
+                            <label for="user_registration-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="validation">用户电子邮件验证</label>
+                        <div class="form-group">
+                            <input type="radio" name="validation" id="validation-enabled" value="on" <?php echo ($pt->config->validation == 'on') ? 'checked': '';?>>
+                            <label for="validation-enabled">启用</label>
+                            <input type="radio" name="validation" id="validation-disabled" value="off" <?php echo ($pt->config->validation == 'off') ? 'checked': '';?>>
+                            <label for="validation-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="delete_account">删除用户账号</label>
+                        <div class="form-group">
+                            <input type="radio" name="delete_account" id="delete_account-enabled" value="on" <?php echo ($pt->config->delete_account == 'on') ? 'checked': '';?>>
+                            <label for="delete_account-enabled">启用</label>
+                            <input type="radio" name="delete_account" id="delete_account-disabled" value="off" <?php echo ($pt->config->delete_account == 'off') ? 'checked': '';?>>
+                            <label for="delete_account-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <label for="verification_badge">用户认证微章</label>
+                        <div class="form-group">
+                            <input type="radio" name="verification_badge" id="verification_badge-enabled" value="on" <?php echo ($pt->config->verification_badge == 'on') ? 'checked': '';?>>
+                            <label for="verification_badge-enabled">启用</label>
+                            <input type="radio" name="verification_badge" id="verification_badge-disabled" value="off" <?php echo ($pt->config->verification_badge == 'off') ? 'checked': '';?>>
+                            <label for="verification_badge-disabled" class="m-l-20">禁用</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 col-md-6  pull-right">
+            <div class="card">
+                <div class="header">
+                    <h2>API设置</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success api-settings-alert"></div>
+                    <form class="api-settings" method="POST">
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="yt_api" name="yt_api" class="form-control" value="{{CONFIG yt_api}}">
+                                <label class="form-label">YouTube API key</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 ">
+            <div class="card">
+                <div class="header">
+                    <h2>服务设置</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success server-settings-alert"></div>
+                    <form class="server-settings" method="POST">
+                        <label for="server">消息和通知服务器</label>
+                        <div class="form-group">
+                            <input type="radio" name="server" id="server-enabled" value="nodejs" <?php echo ($pt->config->server == 'nodejs') ? 'checked': '';?>>
+                            <label for="server-enabled">WebSockets（需要Nodejs）</label>
+                            <input type="radio" name="server" id="server-disabled" value="ajax" <?php echo ($pt->config->server == 'ajax') ? 'checked': '';?>>
+                            <label for="server-disabled" class="m-l-20">Ajax</label>
+                        </div>
+                         <a href="https://docs.playtubescript.com/faqs.html#a-sdfsdf5" target="_blank">如何在服务器上运行和安装Nodejs / forever / npm？</a><br><br>
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 pull-left">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        FFMPEG系统设置 
+                    </h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success ffmpeg-settings-alert"></div>
+                    <form class="ffmpeg-settings" method="POST">
+                        <p>该系统将视频压缩，转换和优化为mp4。 此系统需要在服务器中安装“ffmpeg”. </p><br>
+                        <label for="upload_system">FFMPEG系统 </label>
+                        <div class="form-group">
+                            <input type="radio" name="ffmpeg_system" id="ffmpeg_system-enabled" value="on" <?php echo ($pt->config->ffmpeg_system == 'on') ? 'checked': '';?>>
+                            <label for="ffmpeg_system-enabled">启用</label>
+                            <input type="radio" name="ffmpeg_system" id="ffmpeg_system-disabled" value="off" <?php echo ($pt->config->ffmpeg_system == 'off') ? 'checked': '';?>>
+                            <label for="ffmpeg_system-disabled" class="m-l-20">禁用</label>
+                        </div>   
+                        如何安装FFMPEG？<br>
+                        <a href="https://www.vultr.com/docs/how-to-install-ffmpeg-on-centos" target="_blank">在Linux Centos上安装FFMPEG</a><br>
+                        <a href="https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg" target="_blank">安装FFMPEG在Linux Ubuntu | Windows</a><br>如果您仍然无法安装FFMPEG，请与您的服务器托管服务提供商联系，他们将安装它。 <br><br>
+                        <?php if ($enabled == false): ?>
+                            <p style="color: red">出于安全原因，shell_exec（）已被禁用，请与您的主机提供商联系以启用它。 启用此系统需要shell_exec.</p><br>
+                        <?php endif; ?>
+                        <div class="form-group  form-float">
+                            <br><div class="form-line">
+                                <input type="text" id="ffmpeg_binary_file" name="ffmpeg_binary_file" class="form-control" value="{{CONFIG ffmpeg_binary_file}}">
+                                <?php if (!$pt->config->ffmpeg): ?>
+                                <label class="form-label" style="color: red;">
+                                    路径上不存在FFmpeg二进制文件: {{CONFIG ffmpeg_binary_file}}
+                                </label>
+                                <?php else: ?>
+                                <label class="form-label">
+                                    FFmpeg二进制文件路径： Linux(/usr/bin/ffmpeg) 或 Windows(C:\\ffmpeg\bin\ffmpeg.exe)
+                                </label>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php if ($pt->config->ffmpeg && $enabled == true): ?>
+                        <label for="comments_default_num">视频转换速度</label>
+                        <select class="form-control show-tick" id="convert_speed" name="convert_speed">
+                            <option value="ultrafast" <?php echo ($pt->config->convert_speed == 'ultrafast') ? 'selected': '';?>>极速</option>
+                            <option value="superfast" <?php echo ($pt->config->convert_speed == 'superfast') ? 'selected': '';?>>超极速</option>
+                            <option value="veryfast" <?php echo ($pt->config->convert_speed == 'veryfast') ? 'selected': '';?>>非常快</option>
+                            <option value="faster" <?php echo ($pt->config->convert_speed == 'faster') ? 'selected': '';?>>更快</option>
+                            <option value="fast" <?php echo ($pt->config->convert_speed == 'fast') ? 'selected': '';?>>快速</option>
+                            <option value="medium" <?php echo ($pt->config->convert_speed == 'medium') ? 'selected': '';?>>中等</option>
+                            <option value="slow" <?php echo ($pt->config->convert_speed == 'slow') ? 'selected': '';?>>缓慢</option>
+                            <option value="slower" <?php echo ($pt->config->convert_speed == 'slower') ? 'selected': '';?>>减慢</option>
+                            <option value="veryslow" <?php echo ($pt->config->convert_speed == 'veryslow') ? 'selected': '';?>>非常慢</option>
+                        </select>
+                        <br><br><p>"转换视频速度“会影响编码速度。使用较慢的预设可以提供更好的压缩或每个文件大小的质量，而更快的预设可以提供更差的压缩和更高的文件大小.</p><br><?php endif; ?>
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 pull-right">
+            <div class="card">
+                <div class="header">
+                    <h2>评论设置</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success comment-settings-alert"></div>
+                    <form class="comment-settings" method="POST">
+                        <label for="comment_system">评论系统</label>
+                        <div class="form-group">
+                            <input type="radio" name="comment_system" id="comment_system-both" value="both" <?php echo ($pt->config->comment_system == 'both') ? 'checked': '';?>>
+                            <label for="comment_system-both">全部</label>
+                            <input type="radio" name="comment_system" id="comment_system-own" value="default" <?php echo ($pt->config->comment_system == 'default') ? 'checked': '';?>>
+                            <label for="comment_system-own" class="m-l-20">网站评论系统</label>
+                            <input type="radio" name="comment_system" id="comment_system-facebook" value="fb" <?php echo ($pt->config->comment_system == 'fb') ? 'checked': '';?>>
+                            <label for="comment_system-facebook" class="m-l-20">Facebook</label>
+                        </div>
+                        <label for="comments_default_num">默认显示评论数</label>
+                        <select class="form-control show-tick" id="comments_default_num" name="comments_default_num">
+                            <option value="">-- 请选择 --</option>
+                            <option value="10" <?php echo ($pt->config->comments_default_num == '10') ? 'selected': '';?>>10</option>
+                            <option value="20" <?php echo ($pt->config->comments_default_num == '20') ? 'selected': '';?>>20</option>
+                            <option value="30" <?php echo ($pt->config->comments_default_num == '30') ? 'selected': '';?>>30</option>
+                            <option value="40" <?php echo ($pt->config->comments_default_num == '40') ? 'selected': '';?>>40</option>
+                            <option value="50" <?php echo ($pt->config->comments_default_num == '50') ? 'selected': '';?>>50</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!-- #END# Vertical Layout -->
+<script>
+
+$(function() {
+    var form_videos_settings = $('form.video-settings');
+    var form_user_settings = $('form.user-settings');
+    var form_comment_settings = $('form.comment-settings');
+    var form_api_settings = $('form.api-settings');
+    var ffmpeg_settings = $('form.ffmpeg-settings');
+    var server_settings = $('form.server-settings');
+
+    server_settings.ajaxForm({
+        url: '{{LINK aj/ap/save-settings}}',
+        beforeSend: function() {
+            server_settings.find('.waves-effect').text("{{LANG please_wait}}");
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                server_settings.find('.waves-effect').text('保存');
+                $('.server-settings-alert').html('<i class="fa fa-check"></i> 设置更新成功');
+                setTimeout(function () {
+                    $('.server-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+
+    ffmpeg_settings.ajaxForm({
+        url: '{{LINK aj/ap/save-settings}}',
+        beforeSend: function() {
+            ffmpeg_settings.find('.waves-effect').text("{{LANG please_wait}}");
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                ffmpeg_settings.find('.waves-effect').text('保存');
+                $('.ffmpeg-settings-alert').html('<i class="fa fa-check"></i> 设置更新成功');
+                setTimeout(function () {
+                    $('.ffmpeg-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+
+    form_videos_settings.ajaxForm({
+        url: '{{LINK aj/ap/save-settings}}',
+        beforeSend: function() {
+            form_videos_settings.find('button').text("{{LANG please_wait}}");
+        },
+        success: function(data) {
+            if (data.status == 200) {
+            	form_videos_settings.find('button').text('保存');
+            	$('.video-settings-alert').html('<i class="fa fa-check"></i> 设置更新成功');
+            	setTimeout(function () {
+            		$('.video-settings-alert').empty();
+            	}, 2000);
+            }
+        }
+    });
+
+    form_user_settings.ajaxForm({
+        url: '{{LINK aj/ap/save-settings}}',
+        beforeSend: function() {
+            form_user_settings.find('button').text("{{LANG please_wait}}");
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_user_settings.find('button').text('保存');
+                $('.user-settings-alert').html('<i class="fa fa-check"></i> 设置更新成功');
+                setTimeout(function () {
+                    $('.user-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+
+    form_api_settings.ajaxForm({
+        url: '{{LINK aj/ap/save-settings}}',
+        beforeSend: function() {
+            form_api_settings.find('button').text("{{LANG please_wait}}");
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_api_settings.find('button').text('保存');
+                $('.api-settings-alert').html('<i class="fa fa-check"></i> 设置更新成功');
+                setTimeout(function () {
+                    $('.api-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+
+    form_comment_settings.ajaxForm({
+        url: '{{LINK aj/ap/save-settings}}',
+        beforeSend: function() {
+            form_comment_settings.find('.waves-effect').text("{{LANG please_wait}}");
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_comment_settings.find('.waves-effect').text('保存');
+                $('.comment-settings-alert').html('<i class="fa fa-check"></i> 设置更新成功');
+                setTimeout(function () {
+                    $('.comment-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+});
+</script>

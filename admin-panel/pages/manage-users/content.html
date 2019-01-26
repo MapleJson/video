@@ -1,0 +1,183 @@
+<?php 
+$page = (!empty($_GET['page-id'])) ? $_GET['page-id'] : 1;
+$filter_keyword = (!empty($_GET['query'])) ? PT_Secure($_GET['query']) : '';
+$filter_type    = '';
+$db->pageLimit  = 50;
+$type           = 'all';
+
+if (!empty($_GET['type']) && $_GET['type'] == 'free') {
+    $filter_type = " `is_pro` = 0  AND ";
+    $type        = "free";
+}
+
+elseif (!empty($_GET['type']) && $_GET['type'] == 'pro') {
+    $filter_type = " `is_pro` = 1 AND ";
+    $type        = "pro";
+}
+
+if (!empty($filter_keyword)) {
+    $sql   = " {$filter_type} (username LIKE '%$filter_keyword%' OR email LIKE '%$filter_keyword%' OR id = '$filter_keyword' OR first_name LIKE '%$filter_keyword%' OR last_name LIKE '%$filter_keyword%') ";
+	$users = $db->where($sql)->orderBy('id', 'DESC')->objectbuilder()->paginate(T_USERS, $page);
+} 
+
+else {
+    
+    if ($type == 'free') {
+        $db->where('is_pro',0);
+    }
+
+    else if($type == 'pro'){
+        $db->where('is_pro',1);
+    }
+
+	$users = $db->objectbuilder()->orderBy('id', 'DESC')->paginate(T_USERS, $page);
+}
+
+$get_online_users = $db->where('last_active', time() - 60, '>')->getValue(T_USERS, 'COUNT(*)');
+
+if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
+	header("Location: " . PT_LoadAdminLinkSettings('manage-users'));
+	exit();
+}
+?>
+<div class="container-fluid">
+    <div class="block-header">
+        <h2>用户 > 管理用户</h2>
+    </div>
+    <!-- Vertical Layout -->
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="header">
+                    <h2>管理 & 编辑用户 (<?php echo $get_online_users; ?> 在线用户)</h2>
+                </div>
+                <div class="body">
+                   <div class="row">
+                       <div class="col-md-6" style="margin-bottom:0;">
+                            <form method="get" action="<?php echo PT_LoadAdminLinkSettings('manage-users'); ?>">
+                              <div class="row">
+                              	<div class="col-md-8">
+	                              	<div class="form-group form-float">
+	                                    <div class="form-line">
+	                                        <input type="text" name="query" id="query" class="form-control">
+	                                        <label class="form-label search-form">搜索ID，关键字，电子邮件，用户名，名字，姓氏</label>
+	                                    </div>
+	                                </div>
+	                              </div>
+                                  <div class="col-lg-3 col-md-3">
+                                        <select class="form-control show-tick" name="type">
+                                            <option value="all" <?php echo ($type == 'all') ? 'selected' : '' ?>>全部成员</option>
+                                            <option value="free" <?php echo ($type == 'free') ? 'selected' : '' ?>>免费成员</option>
+                                            <option value="pro" <?php echo ($type == 'pro') ? 'selected' : '' ?>>专业版成员</option>
+                                        </select>
+                                    </div>
+	                              <div class="col-md-1">
+	                              	 <button class="btn btn-info">搜索</button>
+	                              </div>
+                              </div>
+
+                              <div class="clearfix"></div>
+                           </form>
+                       </div>
+                   </div>
+                   <div class="clearfix"></div>
+                   <div class="table-responsive1">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                      <th>ID</th>
+					                  <th>用户名</th>
+                                      <th>电子邮件</th>
+					                  <th>IP地址</th>
+					                  <th>状态</th>
+					                  <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                foreach ($users as $key => $user) {
+                                	$user = PT_UserData($user, array('data' => 1));
+                                	$status = ($user->active == 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-danger">Pending</span>';
+                                	echo PT_LoadAdminPage('manage-users/list', array('USER_DATA' => $user, 'SETTINGS_LINK' => PT_Link('settings/general/' . $user->username), 'STATUS' => $status));
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pull-left">
+                    	<?php echo "显示 $page 一共 " . $db->totalPages; ?>
+                    </div>
+                    <div class="pull-right">
+                    	<nav>
+                            <ul class="pagination">
+                            	<li>
+                                    <a href="<?php echo PT_LoadAdminLinkSettings('manage-users?page-id=1'); ?>" class="waves-effect" title='第一页'>
+                                        <i class="material-icons">first_page</i>
+                                    </a>
+                                </li>
+                                <?php if ($page > 1) {  ?>
+                                <li>
+                                    <a href="<?php echo PT_LoadAdminLinkSettings('manage-users?page-id=' . ($page - 1)); ?>" class="waves-effect" title='上一页'>
+                                        <i class="material-icons">chevron_left</i>
+                                    </a>
+                                </li>
+                                <?php  } ?>
+                                <?php 
+                                $nums = 0;
+                                $nums_pages = ($page > 4) ? ($page - 4) : $page;
+                                for ($i=$nums_pages; $i <= $db->totalPages; $i++) { 
+                                	if ($nums < 20) {
+                                	?>
+                                	<li class="<?php echo ($page == $i) ? 'active' : ''; ?>"><a href="<?php echo PT_LoadAdminLinkSettings('manage-users?page-id=' . ($i)); ?>" class="waves-effect"><?php echo $i ?></a></li>
+                                	<?php
+                                	}
+                                	$nums++;
+                                }
+                                ?>
+                                <?php if ($db->totalPages > $page) { ?>
+                                <li>
+                                    <a href="<?php echo PT_LoadAdminLinkSettings('manage-users?page-id=' . ($page + 1)); ?>" class="waves-effect" title="Next Page">
+                                        <i class="material-icons">chevron_right</i>
+                                    </a>
+                                </li>
+                                <?php } ?>
+                                <li>
+                                    <a href="<?php echo PT_LoadAdminLinkSettings('manage-users?page-id=' . ($db->totalPages)); ?>" class="waves-effect" title='Last Page'>
+                                        <i class="material-icons">last_page</i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!-- #END# Vertical Layout -->
+<div id="delete-modal" class="modal fade" role="dialog" data-id="">
+  <div class="modal-dialog">
+    <div class="modal-content modal-col-red">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">删除用户</h4>
+      </div>
+      <div class="modal-body">
+        <p>你确定你要继续吗？ 此操作无法撤消</p>
+      </div>
+      <div class="modal-footer">
+      	<button type="button" class="btn btn-link waves-effect delete-button" data-dismiss="modal" data-type="user">删除</button>
+        <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(function () {
+	$('.delete-content').on('click', function(event) {
+		event.preventDefault();
+		$('#delete-modal').attr('data-id', $(this).attr('data-id')).modal('show');
+	});
+});
+</script>
